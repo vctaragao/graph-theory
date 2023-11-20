@@ -44,3 +44,11 @@ func NewAdjMatrix(fileName string) AdjacencyMatrix {
 
 	return adjMatrix
 }
+
+func (m AdjacencyMatrix) Len() int {
+	if m == nil {
+		return 0
+	}
+
+	return len(m[0])
+}

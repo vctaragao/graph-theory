@@ -16,7 +16,7 @@ func Dijsktra(adjMatrix entity.AdjacencyMatrix, src, dest int) []int {
 
 	for i := 0; i < nVertices; i++ {
 		route[i] = 0
-		vToBeChecked[i] = i
+		vToBeChecked[i] = int(i)
 		cost[i] = math.MaxInt32
 	}
 
@@ -36,12 +36,13 @@ func Dijsktra(adjMatrix entity.AdjacencyMatrix, src, dest int) []int {
 			}
 		}
 	}
+
 	return buildMinPath(route, src, dest)
 }
 
-func min(vToBeChecked, cost []int) (i, c int) {
+func min(vToBeChecked []int, cost []int) (i int, c int) {
 	minIndex := 0
-	minVertice := 0
+	var minVertice int = 0
 	minimun := math.MaxInt32
 
 	for i, v := range vToBeChecked {
@@ -60,6 +61,7 @@ func buildMinPath(route []int, src, dest int) []int {
 	for v := route[dest]; v != src; v = route[v] {
 		minPath = append(minPath, v)
 	}
+
 	slices.Reverse(minPath)
 	minPath = append(minPath, dest)
 
