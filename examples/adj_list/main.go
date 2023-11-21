@@ -9,12 +9,11 @@ import (
 func main() {
 	adjList := entity.NewAdjacencyList("adjacency_matrix.csv")
 	adjList.Print()
-	adjList.RemoveEdge(entity.NewEdge(0, 1, 3))
-
-	if err := adjList.RemoveEdge(entity.NewEdge(0, 2, 6)); err != nil {
-		fmt.Printf("error: %v", err)
-		return
+	adjList.InsertVertice(entity.Vertice(12))
+	if err := adjList.InsertEdge(12, 1, 10); err != nil {
+		fmt.Printf("err: %v\n", err)
 	}
-
+	adjList.Print()
+	adjList.RemoveVertice(entity.Vertice(12))
 	adjList.Print()
 }

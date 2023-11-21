@@ -9,10 +9,17 @@ import (
 	"strconv"
 
 	"github.com/vctaragao/graphs/pkg/helpers"
+	"golang.org/x/exp/maps"
+	"golang.org/x/exp/slices"
 )
 
-var ErrInvalidEdge = errors.New("invalid edge")
-var ErrInvalidVertice = errors.New("invalid vertice")
+var (
+	ErrInvalidVerticef = "invalid vertice: %v"
+	ErrInvalidVertice  = errors.New("invalid vertice")
+
+	ErrInvalidEdge         = errors.New("invalid edge")
+	ErrVerticeAlredyExists = errors.New("vertice already exists")
+)
 
 type AdjacencyList map[Vertice][]Edge
 
@@ -84,13 +91,31 @@ func (list AdjacencyList) Density() {
 }
 
 // InsertEdge: insert a new edge in to the graph
-func (list AdjacencyList) InsertEdge() {
+func (list AdjacencyList) InsertEdge(src, dest Vertice, wheight int) error {
+	srcAdjs, exists := list[src]
+	if !exists {
+		return fmt.Errorf(ErrInvalidVerticef, src)
+	}
 
+	destAdjs, exists := list[dest]
+	if !exists {
+		return fmt.Errorf(ErrInvalidVerticef, dest)
+	}
+
+	list[src] = append(srcAdjs, NewEdge(src, dest, wheight))
+	list[dest] = append(destAdjs, NewEdge(dest, src, wheight))
+
+	return nil
 }
 
 // InsertVertice: insert a new vertice in to the graph
-func (list AdjacencyList) InsertVertice() {
+func (list AdjacencyList) InsertVertice(v Vertice) error {
+	if _, exists := list[v]; exists {
+		return ErrVerticeAlredyExists
+	}
 
+	list[v] = []Edge{}
+	return nil
 }
 
 // RemoveEdge: remove an existing edge from the graph
@@ -103,21 +128,34 @@ func (list AdjacencyList) RemoveEdge(edge Edge) error {
 				err = nil
 				break
 			}
-
 		}
 	}
-
 	return err
 }
 
 // RemoveVertice: remove an existing vertice from the graph
-func (list AdjacencyList) RemoveVertice() {
+func (list AdjacencyList) RemoveVertice(v Vertice) {
+	edges, exists := list[v]
+	if !exists {
+		return
+	}
 
+	for _, e := range edges {
+		for i, destEdge := range list[e.Dest] {
+			if destEdge.Dest == v {
+				list[e.Dest] = append(list[e.Dest][:i], list[e.Dest][i+1:]...)
+			}
+		}
+	}
+
+	delete(list, v)
 }
 
 func (list AdjacencyList) Print() {
-	for i := 0; i < len(list); i++ {
-		v := Vertice(i)
+	vertices := maps.Keys(list)
+	slices.Sort(vertices)
+
+	for _, v := range vertices {
 		fmt.Printf("Vertice: %v\n", v)
 		fmt.Printf("Adjacências: [\n")
 
